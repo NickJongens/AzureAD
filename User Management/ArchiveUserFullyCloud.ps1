@@ -51,11 +51,6 @@ foreach ($license in $licenses) {
     Set-MsolUserLicense -UserPrincipalName $user.UserPrincipalName -RemoveLicenses $licenseName
 }
 
-# Disconnect from Azure AD and Exchange Online
-Disconnect-AzureAD
-Disconnect-MsolService
-Remove-PSSession $ExchangeSession
-
 # Output the user's group memberships in a table
 Write-Host "The user was a member of the following groups:" -ForegroundColor Yellow
 Write-Host $table
