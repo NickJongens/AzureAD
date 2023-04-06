@@ -21,6 +21,17 @@ foreach ($group in $groups) {
 # Format the user's group memberships in a table
 $table = $groups | Select-Object DisplayName, ObjectId | Format-Table -AutoSize | Out-String
 
+# Get the user's active directory roles
+$roles = Get-AzureADDirectoryRoleMember -ObjectId $user.ObjectId | ForEach-Object { Get-AzureADDirectoryRole -ObjectId $_.DirectoryRoleObjectId }
+
+# Format the user's roles in a table
+$roleTable = $roles | Select-Object DisplayName, ObjectId | Format-Table -AutoSize | Out-String
+
+# Remove the user from all active directory roles
+foreach ($role in $roles) {
+    Remove-AzureADDirectoryRoleMember -ObjectId $role.ObjectId -MemberObjectId $user.ObjectId
+}
+
 # Rename the user's display name
 $newDisplayName = "ARCHIVED - " + $user.DisplayName
 Set-AzureADUser -ObjectId $user.ObjectId -DisplayName $newDisplayName
@@ -43,3 +54,6 @@ Remove-PSSession $ExchangeSession
 # Output the user's group memberships in a table
 Write-Host "The user was a member of the following groups:" -ForegroundColor Yellow
 Write-Host $table
+# Output the user's roles in a table
+Write-Host "The user had the following directory roles:" -ForegroundColor Yellow
+Write-Host $roleTable
