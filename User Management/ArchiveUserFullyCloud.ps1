@@ -21,8 +21,12 @@ foreach ($group in $groups) {
 # Format the user's group memberships in a table
 $table = $groups | Select-Object DisplayName, ObjectId | Format-Table -AutoSize | Out-String
 
-# Get the user's active directory roles
-$roles = Get-AzureADDirectoryRoleMember -ObjectId $user.ObjectId | ForEach-Object { Get-AzureADDirectoryRole -ObjectId $_.DirectoryRoleObjectId }
+# Get the user's directory role memberships
+if ($user.ObjectId) {
+    $roles = Get-AzureADDirectoryRoleMember -ObjectId $user.ObjectId | ForEach-Object {
+        Get-AzureADDirectoryRole -ObjectId $_.DirectoryRole.ObjectId
+    }
+}
 
 # Format the user's roles in a table
 $roleTable = $roles | Select-Object DisplayName, ObjectId | Format-Table -AutoSize | Out-String
@@ -37,7 +41,8 @@ $newDisplayName = "ARCHIVED - " + $user.DisplayName
 Set-AzureADUser -ObjectId $user.ObjectId -DisplayName $newDisplayName
 
 # Convert the user's mailbox to a shared mailbox
-Enable-Mailbox -Identity $user.UserPrincipalName -Shared -Confirm:$false
+$mailboxtoconvert = Get-Mailbox $user.UserPrincipalName
+Set-Mailbox $mailboxtoconvert.Identity -Type Shared
 
 # Remove the user's Office 365 licenses
 $licenses = Get-MsolUserLicense -UserPrincipalName $user.UserPrincipalName
