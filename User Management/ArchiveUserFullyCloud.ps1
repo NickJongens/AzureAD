@@ -35,9 +35,6 @@ foreach ($license in $licenses) {
     Set-MsolUserLicense -UserPrincipalName $user.UserPrincipalName -RemoveLicenses $licenseName
 }
 
-# Remove the user account
-Remove-AzureADUser -ObjectId $user.ObjectId
-
 # Disconnect from Azure AD and Exchange Online
 Disconnect-AzureAD
 Disconnect-MsolService
