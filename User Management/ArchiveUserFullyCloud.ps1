@@ -1,8 +1,7 @@
 # Connect to Azure AD and Exchange Online using modern authentication
 Connect-AzureAD
 Connect-MsolService
-$ExchangeSession = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $Credential -Authentication Basic -AllowRedirection
-Import-PSSession $ExchangeSession
+Connect-ExchangeOnline
 
 # Get the user account to be archived
 $username = Read-Host "Enter the UserPrincipalName of the user to be archived"
